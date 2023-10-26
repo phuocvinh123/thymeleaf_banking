@@ -61,19 +61,6 @@ public class CustomerServiceImpl implements ICustomerService {
 
         update(customer.getId(), customer);
     }
-    public void withdraw(Withdraw withdraw) {
-    Customer customer =withdraw.getCustomer();
-        BigDecimal currentBalance = customer.getBalance();
-        BigDecimal transactionAmount = withdraw.getTransactionAmount();
-        BigDecimal newBalance =currentBalance.add(transactionAmount);
-        customer.setBalance(newBalance);
-        update(customer.getId(),customer);
-    }
-
-    @Override
-    public List<Transfer> findByCustomer(Long customerId) {
-        return (List<Transfer>) findById(customerId);
-    }
 
     @Override
     public void removeById(Long id) {

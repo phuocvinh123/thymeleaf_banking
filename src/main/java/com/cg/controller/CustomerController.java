@@ -6,6 +6,7 @@ import com.cg.model.Transfer;
 import com.cg.model.Withdraw;
 import com.cg.service.customer.CustomerServiceImpl;
 import com.cg.service.customer.ICustomerService;
+import com.cg.service.transfer.TransferServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 public class CustomerController {
 
     private ICustomerService customerService = new CustomerServiceImpl();
+    private TransferServiceImpl transferService =new TransferServiceImpl();
 
     @GetMapping
     public String showListPage(Model model) {
@@ -89,7 +91,12 @@ public class CustomerController {
         model.addAttribute("customer", customer);
         return "customer/update";
     }
-
+    @GetMapping("/transfer_histories")
+    public String ShowTransferHistories(@ModelAttribute Transfer transfer, Model model){
+        List<Transfer> transfers = transferService.findAll();
+        model.addAttribute("transfers", transfers);
+        return "customer/transfer_histories";
+    }
     @PostMapping("/create")
     public String createCustomer(@ModelAttribute Customer customer, Model model) {
 
@@ -195,13 +202,12 @@ public class CustomerController {
                 model.addAttribute("message", "Transfer successful");
             }
         }
-
         List<Customer> recipients = customerService.findAllWithoutId(senderId);
         transfer.setSender(sender);
         transfer.setTransferAmount(null);
         model.addAttribute("transfer", transfer);
         model.addAttribute("recipients", recipients);
-
+        transferService.create(transfer);
         return "customer/transfer";
     }
 }

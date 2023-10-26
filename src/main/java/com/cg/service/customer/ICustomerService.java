@@ -13,6 +13,6 @@ public interface ICustomerService extends IGeneralService<Customer, Long> {
     void deposit(Deposit deposit);
 
     List<Customer> findAllWithoutId(Long id);
-    void withdraw(Withdraw withdraw);
-    List<Transfer> findByCustomer(Long customerId);
+
+
 }
