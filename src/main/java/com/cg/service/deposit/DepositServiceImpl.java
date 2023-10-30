@@ -1,40 +1,43 @@
 package com.cg.service.deposit;
 
 import com.cg.model.Deposit;
+import com.cg.repository.DepositRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import javax.transaction.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
+@Service
+@Transactional
 public class DepositServiceImpl implements IDepositService {
 
-    private final static List<Deposit> deposits = new ArrayList<>();
-
-    private static Long id;
+    @Autowired
+    private DepositRepository depositRepository;
 
     @Override
     public List<Deposit> findAll() {
-        return null;
+        return depositRepository.findAll();
     }
 
     @Override
     public Deposit findById(Long id) {
-        return null;
+        return depositRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void create(Deposit deposit) {
-        deposit.setId(id++);
+    public void save(Deposit deposit) {
         deposit.setDeleted(false);
-        deposits.add(deposit);
+         depositRepository.save(deposit);
     }
 
     @Override
-    public void update(Long id, Deposit deposit) {
-
+    public void delete(Deposit deposit) {
+        depositRepository.delete(deposit);
     }
 
     @Override
-    public void removeById(Long id) {
-
+    public void deleteById(Long aLong) {
+        depositRepository.deleteById(aLong);
     }
 }

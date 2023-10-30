@@ -1,10 +1,17 @@
 package com.cg.model;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-
+@Entity
+@Table(name = "withdraws")
 public class Withdraw {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name= "customer_id", referencedColumnName = "id", nullable = false)
     private Customer customer;
+    @Column( columnDefinition = "decimal(20,0)")
     private BigDecimal transactionAmount;
     private Boolean deleted;
 

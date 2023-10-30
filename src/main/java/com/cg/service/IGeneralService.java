@@ -1,6 +1,7 @@
 package com.cg.service;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IGeneralService<E, T> {
 
@@ -8,9 +9,9 @@ public interface IGeneralService<E, T> {
 
     E findById(T id);
 
-    void create(E e);
+    void save(E e);
 
-    void update(T id, E e);
+    void delete(E e);
 
-    void removeById(T id);
+    void deleteById(T t);
 }

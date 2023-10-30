@@ -1,40 +1,58 @@
 package com.cg.service.withdraw;
 
-import com.cg.model.Deposit;
+
+import com.cg.model.Customer;
 import com.cg.model.Withdraw;
+import com.cg.repository.WithdrawRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import javax.transaction.Transactional;
 
-import java.util.ArrayList;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
-public class WithdrawService implements IWithdrawService{
-    private final static List<Withdraw> withdraws = new ArrayList<>();
-
-    private static Long id;
+@Service
+@Transactional
+public class WithdrawService implements IWithdrawService {
+    @Autowired
+    private WithdrawRepository withdrawRepository;
 
     @Override
     public List<Withdraw> findAll() {
-        return null;
+        return withdrawRepository.findAll();
     }
 
     @Override
     public Withdraw findById(Long id) {
-        return null;
+        return withdrawRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void create(Withdraw withdraw) {
-    withdraw.setId(id++);
-    withdraw.setDeleted(false);
-    withdraws.add(withdraw);
+    public void save(Withdraw withdraw) {
+        withdraw.setDeleted(false);
+         withdrawRepository.save(withdraw);
     }
 
     @Override
-    public void update(Long id, Withdraw withdraw) {
-
+    public void delete(Withdraw withdraw) {
+        withdrawRepository.delete(withdraw);
     }
 
     @Override
-    public void removeById(Long id) {
+    public void deleteById(Long aLong) {
+    withdrawRepository.deleteById(aLong);
+    }
 
+    @Override
+    public boolean isValidWithdrawal(Withdraw withdraw) {
+        Customer customer = withdraw.getCustomer();
+        BigDecimal withdrawalAmount = withdraw.getTransactionAmount();
+
+        if (withdrawalAmount == null || withdrawalAmount.compareTo(BigDecimal.ZERO) <= 0 || withdrawalAmount.compareTo(customer.getBalance()) > 0) {
+            return false;
+        }
+        return true;
     }
 }
