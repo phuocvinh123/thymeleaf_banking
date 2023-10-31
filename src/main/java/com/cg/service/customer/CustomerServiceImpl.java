@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -34,9 +35,6 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public void save(Customer customer) {
-        if(customer.getBalance()==null){
-            customer.setBalance(BigDecimal.ZERO);
-        }
         customerRepository.save(customer);
     }
 
@@ -59,7 +57,10 @@ public class CustomerServiceImpl implements ICustomerService {
         BigDecimal currentBalance = customer.getBalance();
         BigDecimal newBalance = currentBalance.add(transactionAmount);
         customer.setBalance(newBalance);
-
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime formattedDate = LocalDateTime.parse(currentDate.format(formatter), formatter);
+        deposit.setDateDeposit(formattedDate);
         save(customer);
     }
 
@@ -70,7 +71,10 @@ public class CustomerServiceImpl implements ICustomerService {
 
         BigDecimal updatedBalance = customer.getBalance().subtract(withdrawalAmount);
         customer.setBalance(updatedBalance);
-
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime formattedDate = LocalDateTime.parse(currentDate.format(formatter), formatter);
+        withdraw.setDateWithdraw(formattedDate);
         save(customer);
 
     }
@@ -91,9 +95,14 @@ public class CustomerServiceImpl implements ICustomerService {
 
         save(sender);
         save(recipient);
+        transfer.setFees(10L);
         transfer.setFeesAmount(transferFee);
         transfer.setTransactionAmount(totalAmount);
-        transfer.setDateTransfer(LocalDateTime.now());
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime formattedDate = LocalDateTime.parse(currentDate.format(formatter), formatter);
+        transfer.setDateTransfer(formattedDate);
+
     }
 
     @Override

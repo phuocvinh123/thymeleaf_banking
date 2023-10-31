@@ -14,7 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
+
 import java.util.List;
 
 
@@ -83,10 +83,10 @@ public class CustomerController {
         List<Customer> recipients = customerService.findAllByIdNot(senderId);
 
 
-            Transfer transfer = new Transfer();
-            transfer.setSender(customerOptional);
-            model.addAttribute("transfer", transfer);
-            model.addAttribute("recipients", recipients);
+        Transfer transfer = new Transfer();
+        transfer.setSender(customerOptional);
+        model.addAttribute("transfer", transfer);
+        model.addAttribute("recipients", recipients);
 
         return "customer/transfer";
     }
@@ -94,17 +94,41 @@ public class CustomerController {
     @GetMapping("/update/{id}")
     public String ShowUpdate(@PathVariable long id, Model model) {
         Customer customerOptional = customerService.findById(id);
+        if(customerOptional==null){
+            model.addAttribute("success", false);
+            model.addAttribute("message", "id not found");
+            model.addAttribute("customer", new Customer());
+        }else{
+            model.addAttribute("success", true);
             model.addAttribute("customer", customerOptional);
+        }
 
         return "customer/update";
     }
 
-        @GetMapping("/transfer_histories")
-    public String ShowTransferHistories(Model model){
+    @GetMapping("/transfer_histories")
+    public String ShowTransferHistories(Model model) {
         List<Transfer> transfers = transferService.findAll();
         model.addAttribute("transfers", transfers);
         return "customer/transfer_histories";
     }
+
+    @GetMapping("/history-deposit")
+    public String showHistoryDepositPage(Model model) {
+        List<Deposit> deposits = depositService.findAll();
+        model.addAttribute("deposits", deposits);
+
+        return "customer/history-deposit";
+    }
+
+    @GetMapping("/history-withdraw")
+    public String showHistoryWithdrawPage(Model model) {
+        List<Withdraw> withdraws = withdrawService.findAll();
+        model.addAttribute("withdraws", withdraws);
+
+        return "customer/history-withdraw";
+    }
+
     @PostMapping("/create")
     public String createCustomer(@ModelAttribute Customer customer, Model model) {
         customerService.save(customer);
@@ -124,10 +148,10 @@ public class CustomerController {
     }
 
     @PostMapping("/delete/{customerId}")
-    public String deleteCustomer(@PathVariable Long customerId, RedirectAttributes redirectAttributes) {
-
-        customerService.deleteById(customerId);
-
+    public String deleteCustomer(@PathVariable Long customerId ,@ModelAttribute Customer customer, RedirectAttributes redirectAttributes) {
+        customer.setId(customerId);
+        customer.setDeleted(true);
+        customerService.save(customer);
         redirectAttributes.addFlashAttribute("success", true);
         redirectAttributes.addFlashAttribute("message", "Deleted successfully");
 
@@ -141,7 +165,7 @@ public class CustomerController {
         deposit.setCustomer(customer);
 
         customerService.deposit(deposit);
-
+        depositService.save(deposit);
         deposit.setTransactionAmount(null);
         model.addAttribute("deposit", deposit);
         model.addAttribute("success", true);
@@ -157,7 +181,7 @@ public class CustomerController {
 
         if (withdrawService.isValidWithdrawal(withdraw)) {
             customerService.withdraw(withdraw);
-
+            withdrawService.save(withdraw);
             model.addAttribute("success", true);
             model.addAttribute("message", "Withdrawal successful");
         } else {
@@ -181,7 +205,7 @@ public class CustomerController {
         if (transferService.isValidTransfer(transfer)) {
             customerService.transfer(transfer);
             transferService.save(transfer);
-
+            transfer.setTransferAmount(null);
             model.addAttribute("success", true);
             model.addAttribute("message", "Transfer successful");
         } else {

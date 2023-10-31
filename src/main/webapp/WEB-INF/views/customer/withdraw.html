@@ -27,11 +27,11 @@
             <div class="row mb-3 mt-3">
                 <div class="col-lg-6">
                     <label for="fullName" class="form-label fw-bold">Full Name</label>
-                    <input type="text" class="form-control" id="fullName" th:field="*{customer.fullName}" readonly>
+                    <input type="text" class="form-control" id="fullName" th:field="*{customer.fullName}" disabled>
                 </div>
                 <div class="col-lg-6">
                     <label for="email" class="form-label fw-bold">Email</label>
-                    <input type="email" class="form-control" id="email" th:field="*{customer.email}" readonly>
+                    <input type="email" class="form-control" id="email" th:field="*{customer.email}" disabled>
                 </div>
             </div>
             <div class="row mb-3">
@@ -41,7 +41,7 @@
                 </div>
                 <div class="col-lg-6">
                     <label for="address" class="form-label fw-bold">Transaction amount ($)</label>
-                    <input type="text" class="form-control" id="address" th:field="*{transactionAmount}">
+                    <input type="text" class="form-control" id="address" th:field="*{transactionAmount}" >
                 </div>
             </div>
 

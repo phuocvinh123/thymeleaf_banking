@@ -1,7 +1,17 @@
 package com.cg.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "withdraws")
 public class Withdraw {
@@ -13,47 +23,7 @@ public class Withdraw {
     private Customer customer;
     @Column( columnDefinition = "decimal(20,0)")
     private BigDecimal transactionAmount;
-    private Boolean deleted;
+    private LocalDateTime dateWithdraw;
+    private Boolean deleted =false;
 
-    public Withdraw() {
-    }
-
-    public Withdraw(Long id, Customer customer, BigDecimal transactionAmount, Boolean deleted) {
-        this.id = id;
-        this.customer = customer;
-        this.transactionAmount = transactionAmount;
-        this.deleted = deleted;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public BigDecimal getTransactionAmount() {
-        return transactionAmount;
-    }
-
-    public void setTransactionAmount(BigDecimal transactionAmount) {
-        this.transactionAmount = transactionAmount;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
 }

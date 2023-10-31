@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Transfer Histories</title>
+    <title>Deposit Histories</title>
     <th:block th:replace="layout/head :: head" />
 </head>
 <body>
@@ -11,10 +11,10 @@
             <div class="container-fluid">
                 <a class="navbar-brand">Transfer Histories</a>
                 <div class="d-flex" style="gap: 10px;">
-                    <a href="/customers/history-deposit">
+                    <a href="/customers/history">
                         <button class="btn btn-outline-light" type="button">
-                            <i class="fas fa-plus"></i>
-                            Deposit Histories
+                            <i class="fas fa-history"></i>
+                            Transfer Histories
                         </button>
                     </a>
                     <a href="/customers/history-withdraw">
@@ -39,32 +39,23 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th>Sender Name</th>
-                <th>Recipient Name</th>
-                <th>Transfer Amount ($)</th>
-                <th>Fees</th>
-                <th>Fees Amount</th>
-                <th>Transaction Amount</th>
-                <th>Date Transfer</th>
+                <th>Full Name</th>
+                <th>Transaction Amount ($)</th>
+                <th>Date Deposit</th>
             </tr>
             </thead>
             <tbody>
-            <th:block th:each="item : ${transfers}">
+            <th:block th:each="item : ${deposits}">
                 <tr>
                     <td th:text="${item.id}"></td>
-                    <td th:text="${item.sender.fullName}"></td>
-                    <td th:text="${item.recipient.fullName}"></td>
-                    <td th:text="${item.transferAmount}"></td>
-                    <td th:text="${item.fees}"></td>
-                    <td th:text="${item.feesAmount}"></td>
+                    <td th:text="${item.customer.fullName}"></td>
                     <td th:text="${item.transactionAmount}"></td>
-                    <td th:text="${item.dateTransfer}"></td>
+                    <td th:text="${item.dateDeposit}"></td>
                 </tr>
             </th:block>
             </tbody>
         </table>
     </div>
 </div>
-
 </body>
 </html>
