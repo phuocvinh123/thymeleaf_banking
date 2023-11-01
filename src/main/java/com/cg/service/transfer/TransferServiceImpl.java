@@ -3,9 +3,11 @@ package com.cg.service.transfer;
 
 import com.cg.model.Customer;
 import com.cg.model.Transfer;
+import com.cg.repository.CustomerRepository;
 import com.cg.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 
 import java.math.BigDecimal;
@@ -14,8 +16,10 @@ import java.util.List;
 @Service
 @Transactional
 public class TransferServiceImpl implements ITransferService {
-@Autowired
-private TransferRepository transferRepository;
+    @Autowired
+    private TransferRepository transferRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Override
     public List<Transfer> findAll() {
@@ -30,7 +34,9 @@ private TransferRepository transferRepository;
     @Override
     public void save(Transfer transfer) {
         transfer.setDeleted(false);
-         transferRepository.save(transfer);
+        customerRepository.reduceBalance(transfer.getTransactionAmount(), transfer.getSender().getId());
+        customerRepository.incrementBalance(transfer.getTransferAmount(), transfer.getRecipient().getId());
+        transferRepository.save(transfer);
     }
 
     @Override
@@ -42,6 +48,7 @@ private TransferRepository transferRepository;
     public void deleteById(Long aLong) {
         transferRepository.deleteById(aLong);
     }
+
     @Override
     public boolean isValidTransfer(Transfer transfer) {
         Customer sender = transfer.getSender();

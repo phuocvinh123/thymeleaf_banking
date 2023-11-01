@@ -8,11 +8,13 @@ import com.cg.model.Withdraw;
 import com.cg.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -23,9 +25,26 @@ public class CustomerServiceImpl implements ICustomerService {
     private CustomerRepository customerRepository;
 
 
+
     @Override
     public List<Customer> findAll() {
         return customerRepository.findAll();
+    }
+
+    @Override
+    public void incrementBalance(BigDecimal balance, Long id) {
+        customerRepository.incrementBalance(balance, id);
+    }
+
+    @Override
+    public void reduceBalance(BigDecimal balance, Long id) {
+        customerRepository.reduceBalance(balance, id);
+    }
+
+    @Override
+    public List<Customer> findAll(boolean deleted) {
+        List<Customer> customer = findAll();
+        return customer.stream().filter(cus -> !cus.getDeleted()).collect(Collectors.toList());
     }
 
     @Override
@@ -92,9 +111,6 @@ public class CustomerServiceImpl implements ICustomerService {
 
         sender.setBalance(updatedSenderBalance);
         recipient.setBalance(updatedRecipientBalance);
-
-        save(sender);
-        save(recipient);
         transfer.setFees(10L);
         transfer.setFeesAmount(transferFee);
         transfer.setTransactionAmount(totalAmount);
