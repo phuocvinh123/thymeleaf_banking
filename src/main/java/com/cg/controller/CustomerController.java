@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -39,7 +40,7 @@ public class CustomerController {
 
     @GetMapping
     public String showListPage(Model model) {
-        List<Customer> customers = customerService.findAll();
+        List<Customer> customers = customerService.findAll(false);
         model.addAttribute("customers", customers);
 
         return "customer/list";
@@ -63,8 +64,8 @@ public class CustomerController {
     public String showDepositPage(@PathVariable Long customerId, Model model) {
         Customer customerOptional = customerService.findById(customerId);
         Deposit deposit = new Deposit();
-        if(customerOptional==null){
-            deposit=null;
+        if (customerOptional == null) {
+            deposit = null;
         }
 
         deposit.setCustomer(customerOptional);
@@ -76,11 +77,10 @@ public class CustomerController {
     public String showWithdrawPage(@PathVariable Long customerId, Model model) {
         Customer customerOptional = customerService.findById(customerId);
         Withdraw withdraw = new Withdraw();
-        if(customerOptional==null){
-            withdraw=null;
+        if (customerOptional == null) {
+            withdraw = null;
         }
         withdraw.setCustomer(customerOptional);
-
         model.addAttribute("withdraw", withdraw);
 
         return "customer/withdraw";
@@ -91,8 +91,8 @@ public class CustomerController {
         Customer customerOptional = customerService.findById(senderId);
         List<Customer> recipients = customerService.findAllByIdNot(senderId);
         Transfer transfer = new Transfer();
-        if(customerOptional==null){
-            transfer=null;
+        if (customerOptional == null) {
+            transfer = null;
         }
         transfer.setSender(customerOptional);
         model.addAttribute("transfer", transfer);
@@ -165,10 +165,17 @@ public class CustomerController {
 
     @PostMapping("/delete/{customerId}")
     public String deleteCustomer(@PathVariable Long customerId, @ModelAttribute Customer customer, RedirectAttributes redirectAttributes) {
-        customerService.deleteById(customerId);
-        redirectAttributes.addFlashAttribute("success", true);
-        redirectAttributes.addFlashAttribute("message", "Deleted successfully");
-
+         customer=customerService.findById(customerId);
+        if(customer.getBalance().compareTo(BigDecimal.ZERO)>0){
+            redirectAttributes.addFlashAttribute("success", false);
+            redirectAttributes.addFlashAttribute("message", "The remaining balance cannot be deleted");
+        }else{
+            customer.setId(customerId);
+            customer.setDeleted(true);
+            customerService.save(customer);
+            redirectAttributes.addFlashAttribute("success", true);
+            redirectAttributes.addFlashAttribute("message", "Deleted successfully");
+        }
         return "redirect:/customers";
     }
 
@@ -212,21 +219,23 @@ public class CustomerController {
     }
 
     @PostMapping("/transfer/{senderId}")
-    public String Transfer(@PathVariable Long senderId, @ModelAttribute Transfer transfer, @RequestParam Long recipientId, Model model) {
+    public String Transfer(@PathVariable Long senderId, @ModelAttribute Transfer transfer, @RequestParam Long recipientId, Model model, BindingResult bindingResult) {
         Customer sender = customerService.findById(senderId);
         Customer recipient = customerService.findById(recipientId);
         transfer.setSender(sender);
         transfer.setRecipient(recipient);
+        new Transfer().validate(transfer, bindingResult);
 
-        if (transferService.isValidTransfer(transfer)) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("success", false);
+            model.addAttribute("message", "Invalid transfer");
+            model.addAttribute("error", true);
+        } else {
             customerService.transfer(transfer);
             transferService.save(transfer);
             transfer.setTransferAmount(null);
             model.addAttribute("success", true);
             model.addAttribute("message", "Transfer successful");
-        } else {
-            model.addAttribute("success", false);
-            model.addAttribute("message", "Invalid transfer");
         }
 
         List<Customer> recipients = customerService.findAllByIdNot(senderId);

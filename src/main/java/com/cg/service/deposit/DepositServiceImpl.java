@@ -38,7 +38,7 @@ public class DepositServiceImpl implements IDepositService {
         LocalDateTime formattedDate = LocalDateTime.parse(currentDate.format(formatter), formatter);
         deposit.setDateDeposit(formattedDate);
         customerRepository.incrementBalance(deposit.getTransactionAmount(), deposit.getCustomer().getId());
-         depositRepository.save(deposit);
+        depositRepository.save(deposit);
     }
 
     @Override
